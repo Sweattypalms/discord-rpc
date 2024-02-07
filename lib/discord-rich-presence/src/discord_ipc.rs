@@ -4,6 +4,7 @@ use crate::{
     activity::Activity,
     pack_unpack::{pack, unpack},
 };
+use uuid::Uuid;
 use crate::prelude::*;
 
 /// A client that connects to and communicates with the Discord IPC.
