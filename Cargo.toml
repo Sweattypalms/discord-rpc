@@ -29,3 +29,6 @@ discord-rich-presence = {path = "lib/discord-rich-presence"}
 # Misc
 ctrlc = "3.4.2"
 chrono = "0.4.33"
+
+[build-dependencies]
+winres = "0.1.12"

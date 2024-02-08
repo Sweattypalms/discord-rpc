@@ -27,7 +27,14 @@ pub struct RPCProfile {
     pub small_text: Option<String>,
     pub state: Option<String>,
     pub details: Option<String>,
+    pub buttons: Option<Vec<Button>>,
 }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Button {
+    pub label: String,
+    pub url: String,
+}
+
 
 impl RPCConfig {
     pub fn new() -> Self {
@@ -138,7 +145,7 @@ impl RPCConfig {
             std::process::exit(99);
         });
 
-        input.trim() != "y"
+        input.trim() == "y"
     }
 }
 impl Default for RPCConfig {
@@ -151,6 +158,16 @@ impl Default for RPCConfig {
             small_text: Some("small_text".to_string()),
             state: Some("state".to_string()),
             details: Some("details".to_string()),
+            buttons: Some(vec![
+                Button {
+                    label: "Top Button".to_string(),
+                    url: "https://github.com/sweattypalms".to_string(),
+                },
+                Button {
+                    label: "Author".to_string(),
+                    url: "https://github.com/sweattypalms".to_string(),
+                }
+            ]),
         };
 
         let mut profiles = HashMap::new();

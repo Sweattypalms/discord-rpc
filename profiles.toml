@@ -1,8 +1,15 @@
-[profiles.unreal_engine]
-client_id = "1142704283259781141"
+[profiles.demo]
+client_id = "<client-id-here>"
 large_image = "large_image"
 large_text = "large_text"
 small_image = "small_image"
 small_text = "small_text"
 state = "state"
 details = "details"
+
+[[profiles.demo.buttons]]
+label = "Button 1"
+url = "https://example.com"
+[[profiles.demo.buttons]]
+label = "Author"
+url = "https://github.com/sweattypalms/discord-rpc"

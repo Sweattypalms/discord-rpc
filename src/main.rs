@@ -4,7 +4,7 @@ use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient};
-use discord_rich_presence::activity::{Activity, Assets, Timestamps};
+use discord_rich_presence::activity::{Activity, Assets, Button, Timestamps};
 use log::{error, info, LevelFilter, trace};
 
 use crate::config::RPCProfile;
@@ -17,7 +17,7 @@ mod error;
 #[tokio::main]
 async fn main() {
     env_logger::builder()
-        .filter_level(LevelFilter::Debug)
+        .filter_level(LevelFilter::Info)
         .init();
 
     info!("Welcome to Discord Rich Presence!");
@@ -72,7 +72,7 @@ fn discord_rich_presence() {
 
     info!("You selected the following profile: {}", selected_profile);
 
-    make_client(profile).unwrap_or_else(|e| {
+    make_client(selected_profile, profile).unwrap_or_else(|e| {
         error!("Error creating client: {:?}", e);
     });
 }
@@ -87,7 +87,7 @@ fn select_profile() -> String {
     input.trim().to_string()
 }
 
-fn make_client(profile: RPCProfile) -> Result<()> {
+fn make_client(profile_name: String, profile: RPCProfile) -> Result<()> {
     let mut client = DiscordIpcClient::new(profile.client_id.as_str())?;
 
     trace!("Connecting to Discord...");
@@ -108,6 +108,12 @@ fn make_client(profile: RPCProfile) -> Result<()> {
 
     while running.load(std::sync::atomic::Ordering::SeqCst) {
         log::debug!("Updating activity...");
+
+        let profiles = config::RPCConfig::new(); // Reload the profiles
+        let profile = profiles.profiles.get(&profile_name).unwrap_or_else(|| {
+            error!("There was an error getting the profile");
+            std::process::exit(99);
+        });
 
         let activity = get_activity(&profile);
         client.set_activity(activity)?;
@@ -149,6 +155,12 @@ fn get_activity(rpc_profile: &RPCProfile) -> Activity {
     if let Some(state) = rpc_profile.state.as_ref() {
         activity = activity.state(state.as_str());
     }
+
+    if let Some(buttons) = rpc_profile.buttons.as_ref() {
+        let buttons = buttons.iter().map(|button| Button::new(button.label.as_str(), button.url.as_str())).collect();
+        activity = activity.buttons(buttons);
+    }
+
 
     activity
 }
